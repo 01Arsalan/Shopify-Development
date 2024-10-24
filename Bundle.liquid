@@ -1,0 +1,1838 @@
+<section
+  id="MainProduct-{{ section.id }}"
+  class="page-width section-{{ section.id }}-padding py-14 md:pb-20 "
+  data-section="{{ section.id }}"
+>
+  {{ 'section-main-product.css' | asset_url | stylesheet_tag }}
+  {{ 'component-accordion.css' | asset_url | stylesheet_tag }}
+  {{ 'component-price.css' | asset_url | stylesheet_tag }}
+  {{ 'component-rte.css' | asset_url | stylesheet_tag }}
+  {{ 'component-slider.css' | asset_url | stylesheet_tag }}
+  {{ 'component-rating.css' | asset_url | stylesheet_tag }}
+  {{ 'component-loading-overlay.css' | asset_url | stylesheet_tag }}
+  {{ 'component-deferred-media.css' | asset_url | stylesheet_tag }}
+  <!-- for rating stars -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+  <script src="{{ 'product-form.js' | asset_url }}" defer="defer"></script>
+
+  {%- assign first_3d_model = product.media | where: 'media_type', 'model' | first -%}
+  {%- if first_3d_model -%}
+    {{ 'component-product-model.css' | asset_url | stylesheet_tag }}
+    <link
+      id="ModelViewerStyle"
+      rel="stylesheet"
+      href="https://cdn.shopify.com/shopifycloud/model-viewer-ui/assets/v1.0/model-viewer-ui.css"
+      media="print"
+      onload="this.media='all'"
+    >
+    <link
+      id="ModelViewerOverride"
+      rel="stylesheet"
+      href="{{ 'component-model-viewer-ui.css' | asset_url }}"
+      media="print"
+      onload="this.media='all'"
+    >
+  {%- endif -%}
+
+  <div class="container px-5">
+    <div
+      class="product product--{{ settings.media_size }} product--{{ settings.gallery_layout }} grid grid--1-col {% if product.media.size > 0 %}grid--2-col-tablet{% else %}product--no-media{% endif %} grid grid-cols-12 gap-y-10 md:gap-x-10 lg:gap-x-20"
+    >
+      <div class="grid__item col-span-full sm:col-span-6 md:col-span-5 carousel_col">
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+        <!-- Add the slick-theme.css if you want default styling -->
+        <link
+          rel="stylesheet"
+          type="text/css"
+          href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css"
+        >
+        <!-- Add the slick-theme.css if you want default styling -->
+        <link
+          rel="stylesheet"
+          type="text/css"
+          href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick-theme.css"
+        >
+
+        <script
+          type="text/javascript"
+          src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"
+        ></script>
+
+        <!-- jQuery (required by Slick Carousel) -->
+
+        <!-- Slick Carousel JS -->
+        <script
+          type="text/javascript"
+          src="https://cdn.jsdelivr.net/npm/slick-carousel/slick/slick.min.js"
+        ></script>
+
+        <!-- Slick Carousel CSS -->
+        <link
+          rel="stylesheet"
+          type="text/css"
+          href="https://cdn.jsdelivr.net/npm/slick-carousel/slick/slick.css"
+        >
+        <link
+          rel="stylesheet"
+          type="text/css"
+          href="https://cdn.jsdelivr.net/npm/slick-carousel/slick/slick-theme.css"
+        >
+
+        <div class="grid-1">
+          <div class="grid-1-inner">
+            <div class="carousel-container">
+              <div class="carousel">
+                <!-- Images will be dynamically added here -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <script>
+
+                    //getting image data
+                    const products = {};
+
+
+                    {% assign product_ids = "organic-lions-mane-extracted-mushroom-glycerite,mushroom-armor-glycerites,organic-cordyceps-extracted-mushroom-glycerite,red-reishi-glycerites,turkey-tail-glycerites,chaga-glycerites" | split: "," %}
+                    {% assign index = 1 %}
+                    {% for product_id in product_ids %}
+                    {% assign product = all_products[product_id] %}
+
+                    // Get the images for the selected or first available variant
+                    {% assign images = product.media | slice: 0, 3 %}
+
+                    // Convert Liquid array to a JavaScript array
+                    products["{{ index }}"] = [
+                        {% for image in images %}
+                    "{{ image | img_url: '600x600' }}"{% unless forloop.last %}, {% endunless %}
+                    {% endfor %}
+      ];
+
+                    {% assign index = index | plus: 1 %}
+                    {% endfor %}
+
+
+
+
+                    document.addEventListener('DOMContentLoaded', function () {
+                        const carousel = $('.carousel');
+                        let thumbnailsContainer = $('.carousel-thumbnails');
+
+                        if (thumbnailsContainer.length === 0) {
+                            thumbnailsContainer = $('<div class="carousel-thumbnails"></div>').appendTo('.carousel-container');
+                        }
+
+                        // Initialize Slick Carousel
+                        function initializeCarousel() {
+                            carousel.slick({
+                                dots: false, // Disable default dots
+                                infinite: true,
+                                speed: 300,
+                                slidesToShow: 1,
+                                adaptiveHeight: true,
+                                autoplay: true,
+                                autoplaySpeed: 2000,
+                                arrows: true,
+                                prevArrow: '<button type="button" class="slick-prev">Previous</button>',
+                                nextArrow: '<button type="button" class="slick-next">Next</button>',
+                                responsive: [
+                                    {
+                                        breakpoint: 1024,
+                                        settings: {
+                                            slidesToShow: 1,
+                                            slidesToScroll: 1
+                                        }
+                                    },
+                                    {
+                                        breakpoint: 600,
+                                        settings: {
+                                            slidesToShow: 1,
+                                            slidesToScroll: 1
+                                        }
+                                    },
+                                    {
+                                        breakpoint: 480,
+                                        settings: {
+                                            slidesToShow: 1,
+                                            slidesToScroll: 1
+                                        }
+                                    }
+                                ]
+                            });
+
+                            // Set up thumbnails click event
+                            $('.thumbnail').on('click', function () {
+                                const index = $(this).data('index');
+                                carousel.slick('slickGoTo', index);
+                            });
+                        }
+
+                        // Function to load images into the carousel and thumbnails
+                        function loadImages(productId) {
+                            if (carousel.hasClass('slick-initialized')) {
+                                carousel.slick('unslick'); // Destroy previous carousel if it exists
+                            }
+
+                            carousel.empty(); // Clear the carousel content
+                            thumbnailsContainer.empty(); // Clear the thumbnails content
+
+                            products[productId].forEach((imageSrc, index) => {
+                                carousel.append(`<div><img src="${imageSrc}" alt="Product Image"></div>`);
+                                thumbnailsContainer.append(`
+        <div class="thumbnail" data-index="${index}">
+          <img src="${imageSrc}" alt="Thumbnail Image">
+        </div>
+      `);
+                            });
+
+                            initializeCarousel(); // Reinitialize carousel
+                        }
+
+                        // Load the first product by default
+                        loadImages(1);
+
+                        // Event listener for product buttons
+                        document.querySelectorAll('.product-btn').forEach(button => {
+                            button.addEventListener('click', function () {
+                                const productId = this.getAttribute('data-product');
+                                loadImages(productId);
+                            });
+                        });
+                    });
+        </script>
+
+        <style>
+          .product-selector {
+            margin-bottom: 20px;
+          }
+
+          .product-btn {
+            margin-right: 10px;
+            padding: 10px 20px;
+            background-color: #f1f1f1;
+            border: none;
+            cursor: pointer;
+          }
+
+          .product-btn:hover {
+            background: rgba(73, 42, 28, 1);
+          }
+
+          .carousel-container {
+            position: relative;
+            max-width: 100%;
+            margin: 0 auto;
+          }
+
+          .carousel img {
+            width: 100%;
+            height: auto;
+            display: block;
+          }
+
+          .slick-prev:before,
+          .slick-next:before {
+            color: #4a1212;
+          }
+
+          .grid-1-inner {
+            position: sticky;
+            top: 190px;
+          }
+
+          .grid-1 {
+            height: 100%;
+            position: relative;
+            margin: 0 1rem;
+          }
+
+          .carousel-thumbnails {
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+            overflow-x: auto;
+            /* Allows scrolling if there are many thumbnails */
+          }
+
+          .thumbnail {
+            margin-right: 10px;
+            cursor: pointer;
+            flex-shrink: 0;
+            /* Prevent thumbnails from shrinking */
+            width: fit-content;
+            padding: 0;
+            color: rgb(var(--color-base-text));
+            cursor: pointer;
+            background-color: rgba(243, 244, 246, 1);
+            position: initial;
+            border-radius: 4px;
+          }
+
+          .thumbnail img {
+            width: 64px;
+            /* Adjust the width of the thumbnails */
+            height: auto;
+            display: block;
+            border: 2px solid transparent;
+          }
+
+          .thumbnail img:hover,
+          .thumbnail img.active {
+            border-color: #4a1212;
+            /* Highlight active thumbnail */
+          }
+        </style>
+      </div>
+
+      <div
+        class="
+          product__info-wrapper grid__item{% if settings.page_width > 1400 and section.settings.media_size == "
+          small" %} product__info-wrapper--extra-padding{% endif %} col-span-full sm:col-span-6 md:col-span-7
+        "
+      >
+        <div
+          id="ProductInfo-{{ section.id }}"
+          class="product__info-container{% if section.settings.enable_sticky_info %} product__info-container--sticky{% endif %}"
+        >
+          {%- assign product_form_id = 'product-form-' | append: section.id -%}
+
+          <p class="product__five_star_rating">
+            <span class="fa fa-star" style="color: orange;"></span>
+            <span class="fa fa-star" style="color: orange;"></span>
+            <span class="fa fa-star" style="color: orange;"></span>
+            <span class="fa fa-star" style="color: orange;"></span>
+            <span class="fa fa-star" style="color: orange;"></span>
+            <span class="total-rating">(73)</span>
+          </p>
+
+          <div class="product__title" {{ block.shopify_attributes }}>
+            <!--
+              <h1 class="font-marcellus text-primary font-normal text-3xl md:text-4xl lg:text-5xl text-center sm:text-left">{{ product.title | escape }}</h1>
+            -->
+            <h1 class="font-marcellus font-normal text-3xl md:text-4xl lg:text-5xl sm:text-left">
+              Bundle and Save 50% on 4+ Mushroom Extracts
+            </h1>
+            <a href="{{ product.url }}" class="product__title">
+              <h2 class="h1 font-marcellus text-primary font-normal">
+                {{ product.title | escape }}
+              </h2>
+            </a>
+          </div>
+
+          <p
+            class="product__text{% if block.settings.text_style == 'uppercase' %} caption-with-letter-spacing{% elsif block.settings.text_style == 'subtitle' %} subtitle{% endif %}"
+            {{ block.shopify_attributes }}
+          >
+            {{ block.settings.text }}
+          </p>
+
+          {% assign points_array = settings['bundle-description_points'] | split: ',' %}
+          <ul class="description-block">
+            {% for point in points_array %}
+              <li class="description-point">
+                <div class="icon">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 20 20"
+                    fill="none"
+                  >
+                    <path fill-rule="evenodd" clip-rule="evenodd"
+                        d="M10 20C4.47708 20 0 15.5229 0 10C0 4.47708 4.47708 0 10 0C15.5229 0 20 4.47708 20 10C20 15.5229 15.5229 20 10 20ZM14.495 6.6375C14.4287 6.57112 14.3499 6.51846 14.2632 6.48253C14.1765 6.4466 14.0836 6.42811 13.9898 6.42811C13.896 6.42811 13.803 6.4466 13.7164 6.48253C13.6297 6.51846 13.5509 6.57112 13.4846 6.6375L8.92917 11.1946C8.79511 11.3284 8.61341 11.4036 8.42396 11.4036C8.23451 11.4036 8.05281 11.3284 7.91875 11.1946L6.57708 9.8525C6.44315 9.71851 6.26147 9.64321 6.07202 9.64318C5.88257 9.64314 5.70087 9.71836 5.56688 9.85229C5.43289 9.98623 5.35759 10.1679 5.35755 10.3574C5.35751 10.5468 5.43273 10.7285 5.56667 10.8625L7.91875 13.2146C8.19792 13.4938 8.65 13.4938 8.92917 13.2146L14.4954 7.64833C14.7746 7.36917 14.7746 6.91708 14.4954 6.63833"
+                        fill="#492A1C" />
+                  </svg>
+                </div>
+                <p class="text-point">{{ point | strip }}</p>
+              </li>
+              <!-- Use strip to remove any extra whitespace -->
+            {% endfor %}
+          </ul>
+
+          <div class="offer">
+            <p class="offer-text">Add 4 bottles of any kind to activate your 50% discount plus FREE shipping.</p>
+          </div>
+
+          <div class="bundle_products_group product-selector">
+            <!-- bundle_products -->
+
+            {% assign index = 1 %}
+
+            {% assign product_ids = 'organic-lions-mane-extracted-mushroom-glycerite,mushroom-armor-glycerites,organic-cordyceps-extracted-mushroom-glycerite,red-reishi-glycerites,turkey-tail-glycerites,chaga-glycerites'
+              | split: ','
+            %}
+            {% for product_id in product_ids %}
+              {% assign product = all_products[product_id] %}
+
+              <div class="bundle_product bundle_product_additional ">
+                <div
+                  class="product__single-wrapper product-btn"
+                  data-visited="true"
+                  data-product-id="{{ product.id }}"
+                  data-variant-id="{{ product.selected_or_first_available_variant.id }}"
+                  data-selling-plan="{{ product.selected_or_first_available_selling_plan_allocation.selling_plan.id }}"
+                  data-selling-plan-allocation="{{ product.selected_or_first_available_selling_plan_allocation.selling_plan.name }}"
+                  data-product="{{ index }}"
+                  data-discount="{{ settings.bundle-discount }}"
+                >
+                  <input
+                    type="hidden"
+                    name="original_price"
+                    value="{{ product.selected_or_first_available_variant.price }}"
+                  >
+
+                  <div class="product-media">
+                    <img
+                      src="{{ product.images.first.src | image_url }}"
+                      loading="lazy"
+                      width="80"
+                      height="80"
+                    >
+                  </div>
+                  <div class="product-content">
+                    <div class="product-title">{{ product.title }}</div>
+                    <div class="product-subtitle">{{ product.metafields.custom.product_description }}</div>
+                  </div>
+                  <div class="product__quantity-wrapper">
+                    <quantity-input class="quantity">
+                      <button class="quantity__button no-js-hidden" name="minus" type="button">
+                        <span class="visually-hidden"
+                          >Decrease quantity for Lion&amp;#39;s Mane Liquid Extract: Natural Support for Focus, Memory,
+                          &amp;amp; Clear Thinking</span
+                        >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          aria-hidden="true"
+                          focusable="false"
+                          role="presentation"
+                          class="icon icon-minus"
+                          fill="none"
+                          viewBox="0 0 10 2"
+                        >
+                          <path fill-rule="evenodd" clip-rule="evenodd"
+                              d="M.5 1C.5.7.7.5 1 .5h8a.5.5 0 110 1H1A.5.5 0 01.5 1z"
+                              fill="currentColor">
+                          </path>
+                        </svg>
+                      </button>
+                      <input
+                        class="quantity__input"
+                        type="number"
+                        name="quantity"
+                        id="Quantity-template--16717832126640__main"
+                        min="0"
+                        value="0"
+                      >
+                      <button class="quantity__button no-js-hidden" name="plus" type="button">
+                        <span class="visually-hidden"
+                          >Increase quantity for Lion&amp;#39;s Mane Liquid Extract: Natural Support for Focus, Memory,
+                          &amp;amp; Clear Thinking</span
+                        >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          aria-hidden="true"
+                          focusable="false"
+                          role="presentation"
+                          class="icon icon-plus"
+                          fill="none"
+                          viewBox="0 0 10 10"
+                        >
+                          <path fill-rule="evenodd" clip-rule="evenodd"
+                              d="M1 4.51a.5.5 0 000 1h3.5l.01 3.5a.5.5 0 001-.01V5.5l3.5-.01a.5.5 0 00-.01-1H5.5L5.49.99a.5.5 0 00-1 .01v3.5l-3.5.01H1z"
+                              fill="currentColor">
+                          </path>
+                        </svg>
+                      </button>
+                    </quantity-input>
+                  </div>
+                </div>
+              </div>
+              {% assign index = index | plus: 1 %}
+            {% endfor %}
+          </div>
+
+          <div class="buying-plan">
+            <div class="step">
+              <p class="step-number">2</p>
+              <p class="step-title">Select Frequency</p>
+            </div>
+
+            <div class="plan-selector">
+              <div class="inp inp-1">
+                <div class="select">
+                  <input type="radio" id="onetime" name="selling_plan" value="onetime">
+                  <p class="plan-title">One Time Purchase</p>
+                </div>
+                <div class="pricing">
+                  <p class="total-price">$200.00</p>
+                  <p class="product-price"><span class="per-product">$25.00</span> /Per bottle</p>
+                </div>
+              </div>
+
+              <div class="inp-2-detail">
+                <div class="inp inp-2">
+                  <div class="select">
+                    <input type="radio" id="subsave" name="selling_plan" value="subsave">
+                    <p class="plan-title">Subscrive & Save</p>
+                  </div>
+                  <div class="pricing">
+                    <p class="total-price">$69.95</p>
+                    <p class="product-price"><span class="per-product">$25.00</span> /Per bottle</p>
+                  </div>
+                </div>
+
+                <div class="detail-text-1">Add at least 4 bottles to activate 50% discount!</div>
+
+                <div class="detail-points">
+                  {% assign description_points = 'Deliver Every: 30 DAYS, Less than $1 per daily dose,
+                                    No
+                                    Commitments, Cancel Anytime' %}
+                  {% assign description_array = description_points | split: ',' %}
+
+                  {% for point in description_array %}
+                    <div class="point">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="16"
+                        height="16"
+                        viewBox="0 0 16 16"
+                        fill="none"
+                      >
+                        <path fill-rule="evenodd" clip-rule="evenodd"
+                            d="M8 16C3.58167 16 0 12.4183 0 8C0 3.58167 3.58167 0 8 0C12.4183 0 16 3.58167 16 8C16 12.4183 12.4183 16 8 16ZM11.596 5.31C11.5429 5.2569 11.4799 5.21477 11.4106 5.18602C11.3412 5.15728 11.2669 5.14249 11.1918 5.14249C11.1168 5.14249 11.0424 5.15728 10.9731 5.18602C10.9037 5.21477 10.8407 5.2569 10.7877 5.31L7.14333 8.95567C7.03609 9.06276 6.89072 9.1229 6.73917 9.1229C6.58761 9.1229 6.44225 9.06276 6.335 8.95567L5.26167 7.882C5.15452 7.77481 5.00918 7.71457 4.85762 7.71454C4.70606 7.71451 4.56069 7.77469 4.4535 7.88183C4.34631 7.98898 4.28607 8.13432 4.28604 8.28588C4.28601 8.43744 4.34619 8.58281 4.45333 8.69L6.335 10.5717C6.55833 10.795 6.92 10.795 7.14333 10.5717L11.5963 6.11867C11.8197 5.89533 11.8197 5.53367 11.5963 5.31067"
+                            fill="white" />
+                      </svg>
+                      <p class="point-text">{{ point }}</p>
+                    </div>
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+
+            <div class="buy-button-parent">
+              <div class="pricing">
+                <p class="saving">You are saving $0.00</p>
+                <p class="total-saving"><span class="total">$0.00</span><span class="saving"> $0.00</span></p>
+              </div>
+              <button class="bundle-buy-button" onclick="bundleBuyClick(this)">SHOP NOW</button>
+            </div>
+
+            <div class="button-bottom-text">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="32"
+                height="32"
+                viewBox="0 0 32 32"
+                fill="none"
+              >
+                <path
+                    d="M13.9866 2.97333L7.3333 5.48C5.79996 6.05333 4.54663 7.86666 4.54663 9.49333V19.4C4.54663 20.9733 5.58663 23.04 6.8533 23.9867L12.5866 28.2667C14.4666 29.68 17.56 29.68 19.44 28.2667L25.1733 23.9867C26.44 23.04 27.48 20.9733 27.48 19.4V9.49333C27.48 7.85333 26.2266 6.04 24.6933 5.46666L18.04 2.97333C16.9066 2.56 15.0933 2.56 13.9866 2.97333Z"
+                    stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                <path d="M12.0667 15.8267L14.2133 17.9733L19.9467 12.24" stroke="black" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+              <div class="text">
+                <p class="gurantee">100% Risk-Free, Money-Back Guarantee</p>
+                <p class="support">with Great Support via Phone, Chat, and Email.</p>
+              </div>
+            </div>
+          </div>
+
+          {% assign items = '' | split: '' %}
+          <!-- Empty array initialization -->
+
+          {% assign item1 = 'img:https://cdn.shopify.com/s/files/1/0362/1866/7141/files/collection-1.png?v=1670468840|title:3RD
+                    PARTY LAB
+                    TESTED' %}
+          {% assign item2 = 'img:https://cdn.shopify.com/s/files/1/0362/1866/7141/files/collection-2.png?v=1670468840|title:USDA
+                    CERTIFIED
+                    ORGANIC' %}
+          {% assign item3 = 'img:https://cdn.shopify.com/s/files/1/0362/1866/7141/files/collection-3.png?v=1670468839|title:VERTICALLY
+                    INTEGRATED' %}
+
+          {% assign items = items | append: item1 | append: '___' | append: item2 | append: '___' | append: item3 %}
+          {% assign items_array = items | split: '___' %}
+
+          <div class="additional_detail">
+            <ul class="section-top">
+              {% for item in items_array %}
+                {% assign item_parts = item | split: '|' %}
+                <li>
+                  <img src="{{ item_parts[0] | split: 'img:' | last }}" alt="image">
+                  <p>{{ item_parts[1] | split: 'title:' | last }}</p>
+                </li>
+              {% endfor %}
+            </ul>
+
+            <div class="section-bottom">
+              <div class="accordion accordion-flush" id="accordionFlushExample">
+                <div class="accordion-item">
+                  <h2 class="accordion-header" id="flush-headingOne">
+                    <button
+                      class="accordion-button collapsed"
+                      type="button"
+                      data-bs-toggle="collapse"
+                      data-bs-target="#flush-collapseOne"
+                      aria-expanded="false"
+                      aria-controls="flush-collapseOne"
+                    >
+                      How To Use
+                    </button>
+                  </h2>
+                  <div
+                    id="flush-collapseOne"
+                    class="accordion-collapse collapse"
+                    aria-labelledby="flush-headingOne"
+                    data-bs-parent="#accordionFlushExample"
+                  >
+                    <div class="accordion-body">
+                      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum at felis quis arcu vehicula
+                      fermentum ut non magna.
+                    </div>
+                  </div>
+                </div>
+                <div class="accordion-item">
+                  <h2 class="accordion-header" id="flush-headingTwo">
+                    <button
+                      class="accordion-button collapsed"
+                      type="button"
+                      data-bs-toggle="collapse"
+                      data-bs-target="#flush-collapseTwo"
+                      aria-expanded="false"
+                      aria-controls="flush-collapseTwo"
+                    >
+                      Benefits
+                    </button>
+                  </h2>
+                  <div
+                    id="flush-collapseTwo"
+                    class="accordion-collapse collapse"
+                    aria-labelledby="flush-headingTwo"
+                    data-bs-parent="#accordionFlushExample"
+                  >
+                    <div class="accordion-body">
+                      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum at felis quis arcu vehicula
+                      fermentum ut non magna.
+                    </div>
+                  </div>
+                </div>
+                <div class="accordion-item">
+                  <h2 class="accordion-header" id="flush-headingThree">
+                    <button
+                      class="accordion-button collapsed"
+                      type="button"
+                      data-bs-toggle="collapse"
+                      data-bs-target="#flush-collapseThree"
+                      aria-expanded="false"
+                      aria-controls="flush-collapseThree"
+                    >
+                      Shipping Information
+                    </button>
+                  </h2>
+                  <div
+                    id="flush-collapseThree"
+                    class="accordion-collapse collapse"
+                    aria-labelledby="flush-headingThree"
+                    data-bs-parent="#accordionFlushExample"
+                  >
+                    <div class="accordion-body">
+                      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum at felis quis arcu vehicula
+                      fermentum ut non magna.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <a href="{{ product.url }}" class="link product__view-details animate-arrow">
+            {{ 'products.product.view_full_details' | t }}
+            {% render 'icon-arrow' %}
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <product-modal id="ProductModal-{{ section.id }}" class="product-media-modal media-modal">
+    <div
+      class="product-media-modal__dialog"
+      role="dialog"
+      aria-label="{{ 'products.modal.label' | t }}"
+      aria-modal="true"
+      tabindex="-1"
+    >
+      <button
+        id="ModalClose-{{ section.id }}"
+        type="button"
+        class="product-media-modal__toggle"
+        aria-label="{{ 'accessibility.close' | t }}"
+      >
+        {% render 'icon-close' %}
+      </button>
+
+      <div
+        class="product-media-modal__content gradient"
+        role="document"
+        aria-label="{{ 'products.modal.label' | t }}"
+        tabindex="0"
+      >
+        {%- liquid
+          if product.selected_or_first_available_variant.featured_media != null
+            assign media = product.selected_or_first_available_variant.featured_media
+            render 'product-media', media: media, loop: section.settings.enable_video_looping, variant_image:
+            section .settings.hide_variants
+          endif
+        -%}
+
+        {%- for media in product.media -%}
+          {%- liquid
+            if section.settings.hide_variants and variant_images contains media.src
+              assign variant_image = true
+            else
+              assign variant_image = false
+            endif
+
+            unless media.id == product.selected_or_first_available_variant.featured_media.id
+              render 'product-media', media: media, loop: section.settings.enable_video_looping, variant_image:
+              variant_image
+            endunless
+          -%}
+        {%- endfor -%}
+      </div>
+    </div>
+  </product-modal>
+
+  {% assign popups = section.blocks | where: 'type', 'popup' %}
+  {%- for block in popups -%}
+    <modal-dialog id="PopupModal-{{ block.id }}" class="product-popup-modal" {{ block.shopify_attributes }}>
+      <div
+        role="dialog"
+        aria-label="{{ block.settings.text }}"
+        aria-modal="true"
+        class="product-popup-modal__content"
+        tabindex="-1"
+      >
+        <button
+          id="ModalClose-{{ block.id }}"
+          type="button"
+          class="product-popup-modal__toggle"
+          aria-label="{{ 'accessibility.close' | t }}"
+        >
+          {% render 'icon-close' %}
+        </button>
+        <div class="product-popup-modal__content-info">
+          <h1 class="h2">{{ block.settings.page.title }}</h1>
+          {{ block.settings.page.content }}
+        </div>
+      </div>
+    </modal-dialog>
+  {%- endfor -%}
+
+  {%- if product.media.size > 0 -%}
+    <script src="{{ 'product-modal.js' | asset_url }}" defer="defer"></script>
+    <script src="{{ 'media-gallery.js' | asset_url }}" defer="defer"></script>
+  {%- endif -%}
+
+  {%- if first_3d_model -%}
+    <script type="application/json" id="ProductJSON-{{ product.id }}">
+      {{ product.media | where: 'media_type', 'model' | json }}
+    </script>
+    <script src="{{ 'product-model.js' | asset_url }}" defer></script>
+  {%- endif -%}
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      function isIE() {
+        const ua = window.navigator.userAgent;
+        const msie = ua.indexOf('MSIE ');
+        const trident = ua.indexOf('Trident/');
+
+        return msie > 0 || trident > 0;
+      }
+
+      if (!isIE()) return;
+      const hiddenInput = document.querySelector('#{{ product_form_id }} input[name="id"]');
+      const noScriptInputWrapper = document.createElement('div');
+      const variantSwitcher =
+        document.querySelector('variant-radios[data-section="{{ section.id }}"]') ||
+        document.querySelector('variant-selects[data-section="{{ section.id }}"]');
+      noScriptInputWrapper.innerHTML = document.querySelector(
+        '.product-form__noscript-wrapper-{{ section.id }}'
+      ).textContent;
+      variantSwitcher.outerHTML = noScriptInputWrapper.outerHTML;
+
+      document.querySelector('#Variants-{{ section.id }}').addEventListener('change', function (event) {
+        hiddenInput.value = event.currentTarget.value;
+      });
+    });
+  </script>
+
+  {%- liquid
+    if product.selected_or_first_available_variant.featured_media
+      assign seo_media = product.selected_or_first_available_variant.featured_media
+    else
+      assign seo_media = product.featured_media
+    endif
+  -%}
+
+  <script type="application/ld+json">
+    {
+    	"@context": "http://schema.org/",
+    	"@type": "Product",
+    	"name": {{ product.title | json }},
+    	"url": {{ request.origin | append: product.url | json }},
+    	{% if seo_media -%}
+    		"image": [
+    			{{ seo_media | image_url: width: seo_media.preview_image.width | prepend: "https:" | json }}
+    		],
+    	{%- endif %}
+    	"description": {{ product.description | strip_html | json }},
+    	{% if product.selected_or_first_available_variant.sku != blank -%}
+    		"sku": {{ product.selected_or_first_available_variant.sku | json }},
+    	{%- endif %}
+    	"brand": {
+    		"@type": "Brand",
+    		"name": {{ product.vendor | json }}
+    	},
+    	"offers": [
+    		{%- for variant in product.variants -%}
+    			{
+    				"@type" : "Offer",
+    				{%- if variant.sku != blank -%}
+    					"sku": {{ variant.sku | json }},
+    				{%- endif -%}
+    				{%- if variant.barcode.size == 12 -%}
+    					"gtin12": {{ variant.barcode }},
+    				{%- endif -%}
+    				{%- if variant.barcode.size == 13 -%}
+    					"gtin13": {{ variant.barcode }},
+    				{%- endif -%}
+    				{%- if variant.barcode.size == 14 -%}
+    					"gtin14": {{ variant.barcode }},
+    				{%- endif -%}
+    				"availability" : "http://schema.org/{% if variant.available %}InStock{% else %}OutOfStock{% endif %}",
+    				"price" : {{ variant.price | divided_by: 100.00 | json }},
+    				"priceCurrency" : {{ cart.currency.iso_code | json }},
+    				"url" : {{ request.origin | append: variant.url | json }}
+    			}{% unless forloop.last %},{% endunless %}
+    		{%- endfor -%}
+    	]
+    }
+  </script>
+</section>
+
+{% schema %}
+{
+  "name": "Bundle ",
+  "class": "section",
+  "tag": "section",
+  "presets": [
+    {
+      "name": "Bundle"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "@app"
+    },
+    {
+      "type": "rating_stars",
+      "name": "rating_stars"
+    },
+    {
+      "type": "text",
+      "name": "t:sections.main-product.blocks.text.name",
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "default": "Text block",
+          "label": "t:sections.main-product.blocks.text.settings.text.label"
+        },
+        {
+          "type": "select",
+          "id": "text_style",
+          "options": [
+            {
+              "value": "body",
+              "label": "t:sections.main-product.blocks.text.settings.text_style.options__1.label"
+            },
+            {
+              "value": "subtitle",
+              "label": "t:sections.main-product.blocks.text.settings.text_style.options__2.label"
+            },
+            {
+              "value": "uppercase",
+              "label": "t:sections.main-product.blocks.text.settings.text_style.options__3.label"
+            }
+          ],
+          "default": "body",
+          "label": "t:sections.main-product.blocks.text.settings.text_style.label"
+        }
+      ]
+    },
+    {
+      "type": "title",
+      "name": "t:sections.main-product.blocks.title.name",
+      "limit": 1
+    },
+    {
+      "type": "price",
+      "name": "t:sections.main-product.blocks.price.name",
+      "limit": 1
+    },
+    {
+      "type": "variant_picker",
+      "name": "t:sections.main-product.blocks.variant_picker.name",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "select",
+          "id": "picker_type",
+          "options": [
+            {
+              "value": "dropdown",
+              "label": "t:sections.main-product.blocks.variant_picker.settings.picker_type.options__1.label"
+            },
+            {
+              "value": "button",
+              "label": "t:sections.main-product.blocks.variant_picker.settings.picker_type.options__2.label"
+            }
+          ],
+          "default": "button",
+          "label": "t:sections.main-product.blocks.variant_picker.settings.picker_type.label"
+        }
+      ]
+    },
+
+    {
+      "type": "description",
+      "name": "t:sections.main-product.blocks.description.name",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "description_points",
+          "default": "points...",
+          "label": "t:sections.main-product.blocks.description.points",
+          "info": "t:sections.main-product.blocks.description.info"
+        }
+      ]
+    },
+    {
+      "type": "bundle_form",
+      "name": "Bundle Form",
+      "settings": [
+        {
+          "type": "product_list",
+          "id": "bundle_products",
+          "label": "t:sections.main-product.blocks.bundle_products.settings.products_label"
+        }
+      ]
+    },
+    {
+      "type": "additional_detail",
+      "name": "Additional Detail"
+    },
+    {
+      "type": "share",
+      "name": "t:sections.main-product.blocks.share.name",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "share_label",
+          "label": "t:sections.main-product.blocks.share.settings.text.label",
+          "default": "Share"
+        },
+        {
+          "type": "paragraph",
+          "content": "t:sections.main-product.blocks.share.settings.featured_image_info.content"
+        },
+        {
+          "type": "paragraph",
+          "content": "t:sections.main-product.blocks.share.settings.title_info.content"
+        }
+      ]
+    }
+  ],
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "enable_sticky_info",
+      "default": true,
+      "label": "t:sections.main-product.settings.enable_sticky_info.label"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.main-product.settings.header.content",
+      "info": "t:sections.main-product.settings.header.info"
+    },
+    {
+      "type": "select",
+      "id": "gallery_layout",
+      "options": [
+        {
+          "value": "stacked",
+          "label": "t:sections.main-product.settings.gallery_layout.options__1.label"
+        },
+        {
+          "value": "thumbnail",
+          "label": "t:sections.main-product.settings.gallery_layout.options__2.label"
+        },
+        {
+          "value": "thumbnail_slider",
+          "label": "t:sections.main-product.settings.gallery_layout.options__3.label"
+        }
+      ],
+      "default": "thumbnail_slider",
+      "label": "t:sections.main-product.settings.gallery_layout.label"
+    },
+    {
+      "type": "select",
+      "id": "media_size",
+      "options": [
+        {
+          "value": "small",
+          "label": "t:sections.main-product.settings.media_size.options__1.label"
+        },
+        {
+          "value": "medium",
+          "label": "t:sections.main-product.settings.media_size.options__2.label"
+        },
+        {
+          "value": "large",
+          "label": "t:sections.main-product.settings.media_size.options__3.label"
+        }
+      ],
+      "default": "large",
+      "label": "t:sections.main-product.settings.media_size.label",
+      "info": "t:sections.main-product.settings.media_size.info"
+    },
+    {
+      "type": "select",
+      "id": "mobile_thumbnails",
+      "options": [
+        {
+          "value": "show",
+          "label": "t:sections.main-product.settings.mobile_thumbnails.options__1.label"
+        },
+        {
+          "value": "hide",
+          "label": "t:sections.main-product.settings.mobile_thumbnails.options__2.label"
+        }
+      ],
+      "default": "hide",
+      "label": "t:sections.main-product.settings.mobile_thumbnails.label"
+    },
+    {
+      "type": "checkbox",
+      "id": "hide_variants",
+      "default": false,
+      "label": "t:sections.main-product.settings.hide_variants.label"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_video_looping",
+      "default": false,
+      "label": "t:sections.main-product.settings.enable_video_looping.label"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.all.padding.section_padding_heading"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "t:sections.all.padding.padding_top",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "t:sections.all.padding.padding_bottom",
+      "default": 36
+    }
+  ]
+}
+{% endschema %}
+
+{%- style -%}
+  .product--no-media {
+    max-width: fit-content !important;
+  }
+  .container .product {
+    margin-top: 2rem;
+  }
+
+  .product--large:not(.product--no-media) .product__info-wrapper {
+    padding-left: unset;
+    max-width: unset;
+    width: unset;
+  }
+  .product-form__input input + label:hover,
+  .product-form__input input:checked + label {
+    background-color: #ffbf71;
+    border-color: #ffbf71;
+    color: #5b342d;
+  }
+  .button--secondary:before,
+  .button--secondary:after {
+    display: none;
+  }
+  .shopify-payment-button__button {
+    padding: 0.75rem 1.75rem;
+    min-width: 100%;
+    min-height: unset;
+    font-size: 1.5rem;
+    line-height: 2rem;
+  }
+  .shopify-payment-button {
+    width: 100%;
+  }
+  .product-form__submit,
+  .shopify-payment-button__button {
+    padding: 0.75rem 2rem;
+    text-align: center;
+    font-size: 1.125rem;
+    line-height: 1.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    border-radius: 4px !important;
+    background-color: #5b342d;
+    color: #fff;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    border: 1px solid #5b342d;
+  }
+  .shopify-payment-button__button {
+    background-color: #cfe3d7;
+    border-color: #cfe3d7;
+    color: #5b342d;
+  }
+  .product-form__submit:hover,
+  .shopify-payment-button__button:hover {
+    background-color: transparent;
+    color: #5b342d;
+  }
+  .shopify-payment-button__button:hover {
+    border-color: #cfe3d7;
+  }
+  .product__description ol,
+  .product__description ul {
+    margin-bottom: 24px;
+  }
+  .product__description ol li,
+  .product__description ul li {
+    list-style: initial;
+  }
+  .product--thumbnail .product__media-item:not(.is-active),
+  .product--thumbnail_slider .product__media-item:not(.is-active) {
+    display: none;
+  }
+  .accordion {
+    margin-top: 0;
+  }
+  .accordion__content {
+    margin-bottom: 0;
+  }
+  #main-product-additional-description {
+    background: #5b342d;
+  }
+  #main-product-additional-description .container-fluid .additional-description-row {
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 0;
+  }
+  .additional-image {
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+  .additional-content {
+    display: flex;
+    flex-direction: column;
+    padding: 40px 20px;
+    gap: 32px;
+  }
+  .additional-content .column-header {
+    display: flex;
+    flex-direction: column;
+  }
+  .additional-content .column-header h3 {
+    font-family: 'Marcellus';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 32px;
+    line-height: 130%;
+    color: #ffbf71;
+  }
+  .additional-content .column-desc {
+    display: flex;
+    flex-direction: column;
+  }
+  .additional-content .column-desc ul {
+    list-style: initial;
+    margin-bottom: 1.5rem;
+    margin-left: 1.5rem;
+  }
+  .additional-content .column-desc p,
+  .additional-content .column-desc li {
+    font-family: 'Marcellus';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 22px;
+    line-height: 132.52%;
+    color: #ffffff;
+  }
+  .additional-content .column-desc li {
+    color: #ffbf71;
+  }
+  .additional-content .column-footer {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .additional-content .column-footer .site-btn {
+    background: #cfe3d7;
+    border-radius: 8px;
+    padding: 14px 37px;
+    gap: 10px;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: 'Montserrat';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 24px;
+    line-height: 132.52%;
+    text-align: center;
+    color: #000000;
+  }
+  @media only screen and (min-width: 992px) {
+    #main-product-additional-description .container-fluid .additional-description-row {
+      flex-direction: row;
+      flex-wrap: nowrap;
+    }
+    #main-product-additional-description .container-fluid .column {
+      flex: 1 1 auto;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    #main-product-additional-description .container-fluid .column .product-img {
+      justify-self: center;
+      display: flex;
+    }
+  }
+  @media only screen and (min-width: 1200px) {
+    .additional-content .column-header h3 {
+      font-size: 48px;
+    }
+    .additional-content .column-desc p,
+    .additional-content .column-desc li {
+      font-size: 24px;
+    }
+  }
+  @media only screen and (min-width: 1440px) {
+    #main-product-additional-description .container-fluid .column.additional-content {
+      padding-top: 80px;
+      padding-bottom: 80px;
+      padding-left: 20%;
+      padding-right: 15%;
+    }
+    #main-product-additional-description .container-fluid .column.additional-image {
+      width: 60%;
+    }
+    #main-product-additional-description .container-fluid .column.additional-image .product-img {
+      margin-left: -80%;
+    }
+  }
+  @media only screen and (min-width: 750px) {
+    .product--thumbnail_slider .product__media-gallery {
+      top: 100px;
+    }
+  }
+
+  .global-media-settings {
+    padding-top: 0;
+  }
+
+  .rating_stars .total-rating {
+    font-family: sans-serif;
+  }
+  .description-block {
+    padding-left: 0;
+  }
+  .description-block .description-point {
+    font-size: 22px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  .description-block .description-point svg {
+    width: 40px;
+  }
+  .offer {
+    border-top: 1px solid;
+    padding-top: 2rem;
+  }
+  .offer-text {
+    padding: 1rem;
+    background: rgba(255, 185, 25, 1);
+    text-align: center;
+    border-radius: 8px;
+  }
+  .section-top {
+    display: flex;
+    justify-content: space-evenly;
+    padding-left: 0;
+  }
+  .section-top li {
+    display: flex;
+    flex-flow: column;
+    justify-content: center;
+    align-items: center;
+  }
+  .section-top img {
+    padding: 1rem;
+    width: 120px;
+  }
+  .section-top p {
+    margin-top: 0.3rem;
+    width: 8rem;
+    text-align: center;
+  }
+  .additional_detail {
+    border-top: 1px solid;
+    padding: 1rem;
+    margin-top: 2rem;
+  }
+
+  .accordion-button,
+  .accordion-item {
+    background: transparent;
+  }
+  .accordion-button {
+    font-size: 24px;
+  }
+  .section-bottom {
+    margin-top: 3rem;
+  }
+
+  .bundle_product {
+    background: rgba(248, 248, 248, 1);
+    /* padding: 15px; */
+    border-radius: 8px;
+    border: 0.7px solid gray;
+    overflow: hidden;
+  }
+  .product__single-wrapper {
+    display: flex;
+    align-items: center;
+  }
+  .product-content {
+    margin-left: 10px;
+  }
+  .product-media {
+    min-width: 74px;
+    width: 74px;
+    height: 74px;
+    border-radius: 7px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 1);
+    border: 0.5px solid gray;
+  }
+  .product__quantity-wrapper {
+    width: 100px;
+    overflow: hidden;
+    display: flex;
+    margin-left: auto;
+    background: white;
+    height: fit-content;
+    padding: 6px;
+    border-radius: 7px;
+    border: 0.5px solid gray;
+  }
+  .product-content {
+    margin-left: 10px;
+    color: black;
+    font-family: marcellus;
+  }
+  .product-content .product-title {
+    font-size: 17px;
+  }
+  .product-content .product-subtitle {
+    font-size: 14px;
+  }
+  variant-selects {
+    width: 100%;
+  }
+  variant-selects .select {
+    border: 1px solid white;
+    margin-top: 15px;
+    border-radius: 8px;
+  }
+  .product-form__input,
+  .product-form__input .select {
+    max-width: none;
+    width: 100%;
+  }
+  .product-form__input .select select {
+    width: 100%;
+    color: white;
+    height: fit-content;
+    padding: 10px;
+    font-family: 'Marcellus';
+  }
+  .product-form__input--dropdown {
+    margin-bottom: 0;
+  }
+  .select .icon-caret,
+  .customer select + svg {
+    height: 0.6rem;
+    pointer-events: none;
+    position: absolute;
+    top: calc(50%);
+    right: 20px;
+    color: white;
+  }
+
+  .bundle_products_group {
+    display: flex;
+    flex-flow: column;
+  }
+  .bundle_product_additional:first-child {
+    margin-top: 1rem;
+  }
+  .bundle_product_additional {
+    background: rgba(248, 248, 248, 1);
+    margin-bottom: 1rem;
+    border: 0.7px solid gray;
+  }
+  .bundle_product_additional .product__quantity-wrapper {
+    border: 0.5px solid gray;
+  }
+  .bundle_product_additional .product-title,
+  .bundle_product_additional .product-subtitle {
+    color: black;
+  }
+
+  .step {
+    display: none;
+    /* display:flex; */
+    font-family: 'Marcellus';
+    border-bottom: 1px solid;
+  }
+  .step-number {
+    height: 30px;
+    width: 30px;
+    border-radius: 50%;
+    border: 1px solid;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 10px;
+  }
+  .step-title {
+    font-size: 20px;
+  }
+
+  .plan-selector {
+    display: none;
+  }
+  .plan-selector .inp {
+    display: flex;
+    font-family: 'Marcellus';
+    padding: 20px 15px;
+    margin-top: 15px;
+    background: rgba(248, 248, 248, 1);
+    border: 0.4px solid gray;
+    border-radius: 8px;
+  }
+  .plan-selector .inp .select {
+    display: flex;
+    align-items: center;
+    font-family: 'Marcellus';
+  }
+  .plan-selector .inp .select input {
+    height: fit-content;
+    margin-right: 10px;
+  }
+  .plan-selector .pricing {
+    display: flex;
+    align-items: center;
+  }
+  .plan-selector .pricing .total-price {
+    text-decoration: line-through;
+    color: gray;
+    align-items: center;
+    font-size: 13px;
+    margin-bottom: 0;
+    text-wrap: nowrap;
+    margin-left: 10px;
+    font-size: 13px;
+  }
+  .plan-selector .pricing .product-price {
+    text-wrap: nowrap;
+    margin-left: 10px;
+    font-size: 12px;
+  }
+  .plan-selector .inp-2 {
+    border: none;
+    background: transparent;
+    padding: 0;
+  }
+  .detail-text-1 {
+    text-align: center;
+    font-size: 'Marcellus';
+    font-size: 14px;
+    border-bottom: 1px solid white;
+    padding-bottom: 8px;
+  }
+  .detail-points {
+    margin-top: 10px;
+  }
+  .inp-2-detail .point {
+    display: flex;
+    align-items: center;
+  }
+  .inp-2-detail .point svg {
+    margin-right: 10px;
+  }
+
+  .inp-2-detail {
+    padding: 15px;
+    background: rgba(73, 42, 28, 1);
+    margin-top: 15px;
+    border-radius: 8px;
+    color: white;
+  }
+
+  .bundle-buy-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    padding: 18px;
+    margin-top: 15px;
+    background: rgba(255, 185, 25, 1);
+    border-radius: 8px;
+    font-weight: 700;
+    letter-spacing: 2px;
+  }
+  .button-bottom-text {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 15px;
+  }
+  .button-bottom-text .text {
+    margin-left: 10px;
+  }
+  .button-bottom-text .text p {
+    margin-bottom: 0;
+    font-size: 13px;
+  }
+
+  .bundle_product_additional .select {
+    border: 1px solid #000000;
+  }
+  .bundle_product_additional .select svg,
+  .bundle_product_additional .select select {
+    color: black;
+  }
+  .bundle_product_additional variant-selects {
+    display: none;
+  }
+  .bundle_product_additional:hover variant-selects {
+    display: flex;
+  }
+
+  .section-bottom,
+  variant-selects {
+    display: none !important;
+  }
+
+  .buy-button-parent .pricing {
+    display: flex;
+    justify-content: space-between;
+    padding: 0 4px;
+  }
+  .buy-button-parent .saving {
+    color: green;
+    font-size: 20px;
+    margin-bottom: 0;
+  }
+  .buy-button-parent .total-saving {
+    font-size: 20px;
+    display: flex;
+    gap: 10px;
+  }
+  .buy-button-parent .total-saving .total {
+    text-decoration: line-through;
+  }
+  .buy-button-parent .total-saving .saving {
+    color: rgba(146, 87, 17, 1);
+  }
+
+  .bundle_product:hover,
+  .bundle_product_additional:hover {
+    background: rgba(73, 42, 28, 1);
+    color: black;
+  }
+  .bundle_product:hover .product-content .product-title,
+  .bundle_product:hover .product-content .product-subtitle,
+  .bundle_product_additional:hover .product-content .product-title,
+  .bundle_product_additional:hover .product-content .product-subtitle {
+    color: white;
+  }
+  .bundle_product:hover .product-content .product-media,
+  .bundle_product:hover .product-content .product-media,
+  .bundle_product_additional:hover .product-content .product-media,
+  .bundle_product_additional:hover .product-content .product-media {
+    background: rgba(221, 221, 221, 1);
+  }
+
+  @media (max-width: 1250px) {
+    .bundle_product .product__quantity-wrapper,
+    .bundle_product_additional .product__quantity-wrapper {
+      min-width: 80px;
+      max-width: 80px;
+    }
+    .container.px-5 {
+      padding-right: 0.1rem !important;
+      padding-left: 0.1rem !important;
+    }
+  }
+  @media (max-width: 990px) {
+    .bundle_product_additional .product-title {
+      font-size: 14px;
+    }
+    .bundle_product_additional .product-subtitle {
+      font-size: 12px;
+    }
+    .bundle_product .product__quantity-wrapper,
+    .bundle_product_additional .product__quantity-wrapper,
+    .product-media img {
+      scale: 0.8;
+    }
+    .container.px-5 {
+      max-width: fit-content;
+    }
+    .section-top {
+      justify-content: space-between;
+    }
+    .section-top li {
+      width: 5rem;
+    }
+    .section-top img {
+      width: 39px;
+      padding: 0;
+    }
+    .section-top p {
+      font-size: 12px;
+    }
+    .buy-button-parent .saving,
+    .buy-button-parent .total-saving {
+      font-size: 14px;
+    }
+  }
+  @media screen and (min-width: 750px) {
+    .page-width {
+      padding: 0 1rem !important;
+    }
+  }
+
+  @media (max-width: 540px) {
+    .bundle_product {
+      padding: 8px;
+    }
+    .product-content .product-title {
+      font-size: 12px;
+    }
+    .product-content .product-subtitle {
+      font-size: 10px;
+    }
+    .product__title + .product__text.caption-with-letter-spacing {
+      font-size: 12px;
+    }
+    .product__title h1 {
+      font-size: 20px;
+      text-align: left;
+    }
+    #shopify-section-footer div div div div {
+      padding: 10px;
+      width: 100vw;
+    }
+    .description-block .description-point {
+      font-size: 14px;
+    }
+    .description-block .description-point .icon svg {
+      width: 18px;
+    }
+    .section-top p {
+      scale: 0.8;
+    }
+    .buy-button-parent .saving,
+    .buy-button-parent .total-saving {
+      font-size: 13px;
+    }
+    .bundle-buy-button {
+      padding: 12px 18px;
+    }
+  }
+
+  .product__media.media media--transparent.gradient.global-media-settings {
+    padding-top: 0 !important;
+  }
+
+  @media (min-width: 750px) {
+    .product--thumbnail_slider .product__media-gallery {
+      top: 190px;
+    }
+  }
+{%- endstyle -%}
+
+<script>
+  $(document).ready(function () {
+    $(window).trigger('resize');
+  });
+  $(window).on('resize', function () {
+    let windowWidth = $(window).innerWidth(),
+      container = $('.main-header .container').innerWidth(),
+      padding = (windowWidth - container) / 2;
+
+    if (windowWidth > 992) {
+      $('#main-product-additional-description .additional-description-row .additional-content').css({
+        'padding-left': padding + 'px',
+      });
+    } else {
+      $('#main-product-additional-description .additional-description-row .additional-content').removeAttr('style');
+    }
+  });
+
+  function addBundleToCart(bundleItems) {
+    fetch('/cart/add.js', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ items: bundleItems }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log('Bundle added:', data);
+        // redirect to cart
+        window.location.href = '/checkout';
+      })
+      .catch((error) => {
+        console.error('Error adding bundle:', error);
+      });
+  }
+
+  const bundleBuyClick = (button) => {
+    console.log('bundleBuyClick');
+    // Disable the button for 5s
+    button.disabled = true;
+    setTimeout(function () {
+      button.disabled = false;
+    }, 5000);
+
+    const products = document.querySelectorAll('.bundle_product .product__single-wrapper');
+    const productsQuantityInputs = document.querySelectorAll(
+      '.bundle_product .product__single-wrapper .quantity input'
+    );
+    // const planSelectors = document.querySelectorAll(".buying-plan .plan-selector input")
+
+    let data = [];
+    products.forEach((product, idx) => {
+      const id = product.getAttribute('data-variant-id');
+      const quantity = productsQuantityInputs[idx].value;
+      if (quantity > 0) data.push({ id: id, quantity: quantity });
+    });
+
+    // planSelectors.forEach((plan,idx)=>{
+    //   if(plan.checked && idx == 0) addBundleToCart(data)
+    //   if(plan.checked && idx == 1) console.log("subscription not set yet")
+
+    // })
+    addBundleToCart(data);
+  };
+
+  // fuction to add variant fuctionality to products bundle
+  const varientChanger = () => {
+    const selects = document.querySelectorAll('variant-selects .select__select');
+    const closestProduct = select.closest('.product__single-wrapper');
+
+    selects.forEach((select) => {
+      select.addEventListener('change', () => {
+        console.log('select change', select.value);
+        // if(select.value=="60ml"){
+        //   const id = select.getAttribute("data-variant-2")
+        //   closestProduct.setAttribute("data-variant-id",id)
+        // }else{
+        //   const id = select.getAttribute("data-variant-1")
+        //   closestProduct.setAttribute("data-variant-id", id)
+        // }
+      });
+    });
+  };
+  // varientChanger()
+
+  // fuction to update total price to be displayed for bundle
+  const bundlePriceUpdator = () => {
+    const products = document.querySelectorAll('.product__single-wrapper');
+    const PriceSavingElement1 = document.querySelector('.pricing .saving');
+    const PriceSavingElement2 = document.querySelector('.total-saving .saving');
+    const PriceTotalElement = document.querySelector('.total-saving .total');
+
+    const discountData = products[0].getAttribute('data-discount');
+    const values = discountData.split(':');
+    const discountOnProducts = parseInt(values[0]);
+    const discountValue = parseInt(values[1]);
+
+    let productQuan = 0;
+    products.forEach((product) => {
+      product.addEventListener('click', () => {
+        let totalBundlePrice = 0;
+        let totalBundleDiscountedPrice = 0;
+        let totalBundleSaving = 0;
+        products.forEach((product) => {
+          const quan = product.querySelector('.quantity__input').value;
+          if (quan >= 1) {
+            totalBundlePrice += (product.querySelector('input').value / 100) * quan;
+            productQuan += quan;
+          }
+        });
+        if (productQuan >= discountOnProducts) {
+          totalBundleDiscountedPrice = (totalBundlePrice.toFixed(2) * discountValue.toFixed(2)) / 100;
+          totalBundleSaving = totalBundlePrice - totalBundleDiscountedPrice;
+        }
+        PriceSavingElement1.textContent = `You are saving $${totalBundleSaving > 0 ? totalBundleSaving.toFixed(2) : 0}`;
+        PriceSavingElement2.textContent = `$ ${
+          totalBundleDiscountedPrice > 0 ? totalBundleDiscountedPrice.toFixed(2) : totalBundlePrice.toFixed(2)
+        }`;
+        PriceTotalElement.textContent = `$${totalBundlePrice.toFixed(2)}`;
+        productQuan = 0;
+      });
+    });
+  };
+  bundlePriceUpdator();
+</script>
