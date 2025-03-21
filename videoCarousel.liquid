@@ -1,0 +1,214 @@
+<style>
+    .editorial-container {
+      margin: 0 auto;
+      padding: 30px;
+      border-radius: 10px;
+    }
+    
+    /* Custom carousel styles from the provided code */
+    .editorial-custom-carousel {
+      position: relative;
+      width: 100%;
+      margin: 0 auto;
+      overflow: hidden;
+    }
+    
+    .editorial-custom-slides {
+      display: flex;
+      transition: transform 0.5s ease-in-out;
+    }
+    
+    .editorial-custom-slide {
+      box-sizing: border-box;
+      padding: 10px;
+      flex-shrink: 0;
+    }
+    
+    .editorial-custom-buttons {
+      display: flex;
+      justify-content: space-between;
+      position: absolute;
+      color: white;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 9;
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      left: 0;
+    }
+    
+
+    
+    .custom-carousel .video-parent {
+      height: 450px;
+      width:100%;
+      border-radius: 10px;
+      overflow: hidden;
+      background-color: #3498db;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 18px;
+    }
+
+    /* Responsive styles */
+    .editorial-custom-slide {
+      /* Mobile default - 1 slide */
+      width: 100%;
+    }
+    .ieditorial-nner-con{
+      padding: 0 10px;
+      position: relative;
+    }
+
+    
+
+
+    @media (max-width: 2400px) {
+      /* Desktop - 3 slides */
+      .editorial-custom-slide {
+        width: 25%;
+      }
+    }
+    @media (max-width: 1024px) {
+      /* Tablet - 2 slides */
+      .editorial-custom-slide {
+        width: 50%;
+      }
+    }
+    @media (max-width: 768px) {
+      /* Tablet - 2 slides */
+      .editorial-custom-slide {
+        width: 100%;
+      }
+      .editorial-custom-slides {
+        width: 461px;
+      }
+    }
+
+    @media (max-width: 574px) {
+      .editorial-custom-slides {
+        width: 400px;
+      }
+    }
+    @media (max-width: 445px) {
+      .editorial-custom-slides {
+        width: 360px;
+      }
+    }
+    @media (max-width: 389px) {
+      .editorial-custom-slides {
+        width: 350px;
+      }
+    }
+    
+  </style>
+
+  <div class="editorial-container">
+    <div class="editorial-inner-con">
+      <div class="editorial-custom-carousel">
+        <div id="editorial-custom-slides" class="editorial-custom-slides">
+          {% for link in links %}
+            
+           <div class="editorial-custom-slide">
+              <div class="editorial-video-parent">
+                {% render 'video-element', unique_class: "_editorial_" | append: forloop.index , video_link: link %}
+              </div>
+           </div>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="editorial-custom-buttons">
+        <button id="editorial-custom-prev" style="cursor: pointer;">
+          <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="40" height="40" rx="20" fill="#001F5C"/>
+            <path d="M25.3337 19.3337H17.2203L20.947 15.607L20.0003 14.667L14.667 20.0003L20.0003 25.3337L20.9403 24.3937L17.2203 20.667H25.3337V19.3337Z" fill="white"/>
+          </svg>
+        </button>
+        <button id="editorial-custom-next" style="cursor: pointer;">
+          <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="40" height="40" rx="20" fill="#001F5C"/>
+            <path d="M19.9997 13.3311L18.8247 14.5061L23.4747 19.1644H13.333V20.8311H23.4747L18.8247 25.4894L19.9997 26.6644L26.6663 19.9977L19.9997 13.3311Z" fill="white"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const customSlides = document.getElementById('editorial-custom-slides');
+      const customSlideItems = document.querySelectorAll('.editorial-custom-slide');
+      let customIndex = 0;
+      let slidesToShow = 1; // Default for mobile
+      let maxIndex = 0;
+
+      // Function to determine how many slides to show based on viewport
+      function updateSlidesToShow() {
+        const windowWidth = window.innerWidth;
+        
+        if (windowWidth >= 1024) {
+          slidesToShow = 4; // Desktop
+        } else if (windowWidth >= 768) {
+          slidesToShow = 2; // Tablet
+        } else {
+          slidesToShow = 1; // Mobile
+        }
+        
+        // Calculate max index (last slide that should be visible)
+        maxIndex = customSlideItems.length - slidesToShow;
+        
+        // Ensure current index is valid
+        if (customIndex > maxIndex) {
+          customIndex = maxIndex;
+        }
+        
+        // Update carousel position
+        updateCustomSlide(false);
+      }
+
+      // Function to update carousel position
+      function updateCustomSlide(animate = true) {
+        // Calculate single slide width
+        const slideWidth = customSlideItems[0].offsetWidth;
+        const containerWidth = customSlides.parentElement.offsetWidth;
+        const slideWidthPercentage = (slideWidth / containerWidth) * 100;
+        
+        // Apply transition
+        customSlides.style.transition = animate ? 'transform 0.5s ease-in-out' : 'none';
+        customSlides.style.transform = `translateX(-${customIndex * slideWidthPercentage}%)`;
+      }
+
+      // Next button handler
+      document.getElementById('editorial-custom-next').addEventListener('click', () => {
+        if (customIndex >= maxIndex) {
+          // If at the last valid position, loop back to beginning
+          customIndex = 0;
+        } else {
+          // Otherwise, move to next slide
+          customIndex++;
+        }
+        updateCustomSlide();
+      });
+
+      // Previous button handler
+      document.getElementById('editorial-custom-prev').addEventListener('click', () => {
+        if (customIndex <= 0) {
+          // If at the first slide, loop to the last valid position
+          customIndex = maxIndex;
+        } else {
+          // Otherwise, move to previous slide
+          customIndex--;
+        }
+        updateCustomSlide();
+      });
+
+      // Update on window resize
+      window.addEventListener('resize', updateSlidesToShow);
+
+      // Initialize
+      updateSlidesToShow();
+    });
+  </script>
