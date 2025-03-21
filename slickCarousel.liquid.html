@@ -31,7 +31,7 @@ const products_ = {};
 {% for product in collections.all.products %}
     {% if product.metafields.custom.product_page_product %}
         // Get the first 3 images of the product
-        {% assign images = product.media | slice: 0, 5 %}
+        {% assign images = product.media  %}
         
         // Convert Liquid array to JavaScript array
         products_["{{ index }}"] = [
@@ -47,7 +47,9 @@ const products_ = {};
   
   document.addEventListener('DOMContentLoaded', function() {
     const carousel = $('.carousel');
-    const thumbnailsContainer = $('<div class="carousel-thumbnails"></div>').appendTo('.carousel-container');
+    // const thumbnailsContainer = $('<div class="carousel-thumbnails"></div>').appendTo('.carousel-container');
+    const pthumbnailsContainer = $('<div class="parent-carousel-con"></div>').appendTo('.carousel-container');
+    const thumbnailsContainer = $('<div class="carousel-thumbnails"></div>').appendTo('.parent-carousel-con');
 
 
     const initializeSetBordersToSelected = () => {
@@ -55,6 +57,8 @@ const products_ = {};
         document.querySelectorAll(".slick-arrow").forEach(btn=>{
           btn.addEventListener("click",()=>{
             setBorderToSelected()
+            // to bring selected thumbnail into view
+            document.querySelector(".thumbnail.selected")?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
           })
         })
         document.querySelectorAll(".carousel-thumbnails .thumbnail").forEach((btn,idx)=>{
@@ -196,7 +200,7 @@ const products_ = {};
   
   .carousel-container {
     position: relative;
-    max-width: 100%;
+    max-width: 90%;
     margin: 0 auto;
   }
   
@@ -204,19 +208,42 @@ const products_ = {};
     width: 660px;
     height: 520px;
     display: block;
+    object-fit: cover;
   }
   
   
   .grid-1-inner{
         position: sticky;
-      top: 190px;
+      top: 130px;
   }
     .grid-1 {
       height: 100%;
       position: relative;
-      margin: 0 1rem;
+      margin: 0 0rem;
   }
-  
+    .thumbnail img {
+object-fit:cover;
+}
+    .thumbnail {
+      margin-right: 10px;
+      cursor: pointer;
+      width: 100px;
+      aspect-ratio: 2/2;
+    }
+
+    @media (max-width:980px){
+      .thumbnail {
+        width: 100px;
+      }
+    }
+    @media (max-width:768px){
+      .carousel-container {
+        max-width: 100%;
+      }
+      .thumbnail {
+        width: 58px;
+      }
+    }
   
   
   
@@ -236,29 +263,29 @@ const products_ = {};
     .slick-prev svg{
       padding:1px;
     }
+    .parent-carousel-con{
+      overflow-x:scroll;
+    }
     .carousel-thumbnails {
     display: flex;
     justify-content: center;
     margin-top: 10px;
+      width:max-content;
   }
   
-  .thumbnail {
-    margin-right: 10px;
-    cursor: pointer;
-  }
-  
+ 
   .thumbnail img {
     width: 100px;
-    height: 100px;
     display: block;
     border: 2px solid transparent;
     border-radius: 8px;
+    aspect-ratio: 2 / 2;
   }
   
-  .thumbnail img:hover,
+  /* .thumbnail img:hover,
   .thumbnail img.active {
     border-color: #4a1212; /* Highlight active thumbnail */
-  }
+  } */
 
     .slick-prev:hover, .slick-prev:focus, .slick-next:hover, .slick-next:focus {
 }
@@ -270,6 +297,9 @@ const products_ = {};
     .slick-prev {
     left: -45px;
 }
+    .carousel.slick-initialized.slick-slider{
+      margin:0 1rem;
+    }
   
   </style>
   
