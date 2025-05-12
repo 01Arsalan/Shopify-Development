@@ -1,0 +1,345 @@
+<div id="seasonal-product-form" data-product-handle= "{{ product.handle }}">
+  <div class="c-t-a">
+    <p id="seasonal-note" style="display:none; font-size: 14px; margin-bottom: 10px;"></p>
+    <button class="seasonal a-t-c btn--submit product__submit__add btn">SUBSCRIBE NOW</button>
+    <p class="subscription-timing">
+      <img src="https://cdn.shopify.com/s/files/1/0826/9896/1207/files/material-symbols_delivery-truck-speed.png?v=1743780906" />Deliver Every 3 Months
+    </p>
+  </div>
+  <div class="gift-container">
+    <div class="gift-enabler-con">
+      <label class="switch">
+        <input type="checkbox" id="giftToggle">
+        <span class="slider"></span>
+      </label>
+      <label for="giftToggle" class="gift-label">Gift this subscription</label>
+    </div>
+
+    <div class="gift-form">
+      <label for="email">Gift Recipient Email</label>
+      <input type="email" id="email" placeholder="Enter Email">
+
+      <label for="message">Message (optional)</label>
+      <textarea id="message" placeholder="Enter Your Message"></textarea>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const SEASONAL_VARIANTS = {
+    spring: {
+      id: {{ seasonal_data.settings.seasonal_product_spring.variants.first.id | json }},
+      selling_plan_id: {{ seasonal_data.settings.seasonal_product_spring.selling_plan_groups.first.selling_plans.first.id | json }},
+      inventory_quantity: {{ seasonal_data.settings.seasonal_product_spring.variants.first.inventory_quantity | json }}
+    },
+    summer: {
+  id: {{ seasonal_data.settings.seasonal_product_summer.variants.first.id | json }},
+  selling_plan_id: {{ seasonal_data.settings.seasonal_product_summer.selling_plan_groups.first.selling_plans.first.id | json }},
+  inventory_quantity: {{ seasonal_data.settings.seasonal_product_summer.variants.first.inventory_quantity | json }}
+},
+fall: {
+  id: {{ seasonal_data.settings.seasonal_product_fall.variants.first.id | json }},
+  selling_plan_id: {{ seasonal_data.settings.seasonal_product_fall.selling_plan_groups.first.selling_plans.first.id | json }},
+  inventory_quantity: {{ seasonal_data.settings.seasonal_product_fall.variants.first.inventory_quantity | json }}
+},
+winter: {
+  id: {{ seasonal_data.settings.seasonal_product_winter.variants.first.id | json }},
+  selling_plan_id: {{ seasonal_data.settings.seasonal_product_winter.selling_plan_groups.first.selling_plans.first.id | json }},
+  inventory_quantity: {{ seasonal_data.settings.seasonal_product_winter.variants.first.inventory_quantity | json }}
+}
+
+  };
+
+  console.log("SEASONAL_VARIANTS:",SEASONAL_VARIANTS)
+
+function getSeason() {
+  const today = new Date();
+  const year = today.getFullYear();
+
+  const springStart = new Date(year, 2, 20); // March 20
+  const summerStart = new Date(year, 5, 21); // June 21
+  const fallStart = new Date(year, 8, 22);   // September 22
+  const winterStart = new Date(year, 11, 21); // December 21
+
+  if (today >= springStart && today < summerStart) return "spring";
+  if (today >= summerStart && today < fallStart) return "summer";
+  if (today >= fallStart && today < winterStart) return "fall";
+
+  return "winter";
+}
+
+
+  function getNextSeason(current) {
+    const seasons = ["spring", "summer", "fall", "winter"];
+    const idx = seasons.indexOf(current);
+    return seasons[(idx + 1) % 4];
+  }
+
+  function getPreOrderTag() {
+    const season = getSeason();
+    const nextSeason = getNextSeason(season);
+    const year = new Date().getFullYear();
+    const formattedSeason = nextSeason.charAt(0).toUpperCase() + nextSeason.slice(1);
+    return `PREORDER_${formattedSeason}_${year}`;
+  }
+
+  function isProductOutOfStock(product) {
+    return product.inventory_quantity !== null && product.inventory_quantity <= 0;
+  }
+
+  function assignSeasonalVariant() {
+    const season = getSeason();
+    const product = SEASONAL_VARIANTS[season];
+    const isOutOfStock = isProductOutOfStock(product);
+    
+    if (isOutOfStock) {
+      let nextSeason = getNextSeason(season);
+      let attempts = 0;
+      
+      while (attempts < 3) {
+        const nextProduct = SEASONAL_VARIANTS[nextSeason];
+        const isNextOutOfStock = isProductOutOfStock(nextProduct);
+        
+        if (!isNextOutOfStock) {
+          const note = document.getElementById("seasonal-note");
+          const btn = document.querySelector(".seasonal.a-t-c");
+          
+          note.innerHTML = `<span class="note-green">NOTE:</span> This season's Box is sold out. Pre-order next season's Box today!`;
+          note.style.display = "block";
+          btn.textContent = "Pre-Order Next Season's Box";
+          
+          return { 
+            variantId: nextProduct.id, 
+            sellingPlanId: nextProduct.selling_plan_id, 
+            outOfStock: false,
+            isPreOrder: true
+          };
+        }
+        
+        nextSeason = getNextSeason(nextSeason);
+        attempts++;
+      }
+      
+      const note = document.getElementById("seasonal-note");
+      const btn = document.querySelector(".seasonal.a-t-c");
+      
+      note.innerHTML = `<span class="note-green">NOTE:</span> All seasonal boxes are currently sold out. Please check back later.`;
+      note.style.display = "block";
+      btn.textContent = "OUT OF STOCK";
+      btn.disabled = true;
+      return { variantId: null, sellingPlanId: null, outOfStock: true };
+    }
+   
+    return { 
+      variantId: product.id, 
+      sellingPlanId: product.selling_plan_id, 
+      outOfStock: false,
+      isPreOrder: false
+    };
+  }
+
+  const { variantId, sellingPlanId, outOfStock, isPreOrder } = assignSeasonalVariant();
+  const emailInput = document.querySelector("#email");
+  const messageInput = document.querySelector("#message");
+  const isGift = document.querySelector("#giftToggle");
+
+  async function addSubscriptionProductToCart(variantId, quantity = 1, sellingPlanId) {
+
+    try {
+      const cartRes = await fetch('/cart.js');
+      const cart = await cartRes.json();
+
+      // Not sure why even we added this logic here? commenting it for now
+      
+      // const existingItem = cart.items.find(item => item.variant_id === variantId);
+
+      // if (existingItem) {
+      //   alert("You've already added the maximum quantity of this item to your cart.");
+      //   return;
+      // }
+
+      const isPreOrder = document.querySelector(".seasonal.a-t-c").textContent.includes("Pre-Order");
+      
+      const data = {
+        items: [{
+          id: variantId,
+          quantity: quantity,
+          selling_plan: sellingPlanId,
+               properties: {
+            ...(isPreOrder && { 'Seasonal_Preorder': getPreOrderTag() }),
+            ...(document.getElementById("giftToggle").checked && {
+              'Gift Recipient Email': emailInput.value,
+              'Gift Message': messageInput.value
+            })
+          }
+        }]
+      };
+
+      const response = await fetch('/cart/add.js', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      });
+
+      const cartResult = await response.json();
+      console.log('Product added to cart:', cartResult);
+      // window.location.href = '/checkout';
+      
+    } catch (error) {
+      console.error('Error adding product to cart:', error);
+    }
+  }
+
+  const seasonalATC = document.querySelector(".seasonal.a-t-c");
+  seasonalATC.addEventListener("click", _ => {
+    const { variantId, sellingPlanId, outOfStock } = assignSeasonalVariant();
+    
+    if (outOfStock) return;
+
+    seasonalATC.disabled = true;
+    seasonalATC.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" style="width:30px;" viewBox="0 0 200 200"><circle fill="none" stroke-opacity="1" stroke="#FFFFFF" stroke-width=".5" cx="100" cy="100" r="0"><animate attributeName="r" calcMode="spline" dur="2" values="1;80" keyTimes="0;1" keySplines="0 .2 .5 1" repeatCount="indefinite"></animate><animate attributeName="stroke-width" calcMode="spline" dur="2" values="0;25" keyTimes="0;1" keySplines="0 .2 .5 1" repeatCount="indefinite"></animate><animate attributeName="stroke-opacity" calcMode="spline" dur="2" values="1;0" keyTimes="0;1" keySplines="0 .2 .5 1" repeatCount="indefinite"></animate></circle></svg>`;
+
+    setTimeout(() => {
+      addSubscriptionProductToCart(variantId, 1, sellingPlanId);
+      seasonalATC.innerHTML = seasonalATC.textContent.includes("Pre-Order") 
+        ? "Pre-Order Next Season's Box" 
+        : "SUBSCRIBE NOW";
+      seasonalATC.disabled = false;
+    }, 1000);
+  });
+
+  document.getElementById("giftToggle").addEventListener("change", function () {
+    document.querySelector(".gift-form").style.display = this.checked ? "block" : "none";
+  });
+});
+</script>
+
+<style>
+  #seasonal-note {
+    display: none;
+    margin-bottom: 10px;
+    font-size: 14px;
+  }
+
+  .note-green {
+    color: #07B05F;
+    font-weight: 600;
+  }
+  .c-t-a{
+    width:100%;
+    margin-top: 15px;
+  }
+  .a-t-c{
+    width:100%;
+    background: #373A36;
+    height: 60px;
+    color: white;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+  }
+  .a-t-c:disabled {
+    background: #cccccc;
+    cursor: not-allowed;
+  }
+  .subscription-timing{
+    font-size: 12px;
+    margin-top: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    justify-content: center;
+  }
+  .subscription-timing img{
+    width: 20px;
+  }
+
+  .gift-container {
+    background: white;
+    width: 100%;
+    margin-top: 20px;
+  }
+  .gift-enabler-con{
+    display: flex;
+    align-items:center;
+  }
+
+  .switch {
+    position: relative;
+    display: inline-block;
+    width: 34px;
+    height: 20px;
+  }
+
+  .switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    border-radius: 20px;
+    transition: 0.3s;
+  }
+
+  .slider:before {
+    content: "";
+    position: absolute;
+    height: 14px;
+    width: 14px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    border-radius: 50%;
+    transition: 0.3s;
+  }
+
+  input:checked + .slider {
+    background-color: #000;
+  }
+
+  input:checked + .slider:before {
+    transform: translateX(14px);
+  }
+
+  .gift-label {
+    margin-left: 10px;
+    font-size: 18px;
+    cursor: pointer;
+  }
+
+  .gift-form {
+    margin-top: 15px;
+    display:none;
+  }
+
+  .gift-form label {
+    display: block;
+    font-size: 16px;
+    margin-bottom: 5px;
+  }
+
+  .gift-form input, .gift-form textarea {
+    width: 100%;
+    padding: 8px;
+    border: 2px solid black;
+    border-radius: 4px;
+    font-size: 14px;
+    margin-bottom: 14px;
+  }
+
+  .gift-form textarea {
+    height: 47px;
+    resize: none;
+  }
+</style>
