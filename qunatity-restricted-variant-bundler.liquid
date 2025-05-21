@@ -361,6 +361,10 @@ class ResizableLimitedArray {
   clear() {
     this.items = [];
   }
+
+  count(item) {
+    return this.items.filter(el => el === item).length;
+  }
 }
 
   let queue = new ResizableLimitedArray(3);
@@ -404,15 +408,18 @@ class ResizableLimitedArray {
     let colors = []
     variants.forEach(variant=>{
       variant.classList.remove("selected")
+      variant.removeAttribute("data-order")
     })
     queue.getAll().forEach(el=>{
       const variant = document.querySelector(`.image-block[data-index="${el}"]`)
+      variant.setAttribute("data-order",queue.count(el))
       variant.classList.add("selected")      
       const color = variant.getAttribute("data-color")
       colors.push(color)
     })
 
-    SelectedList.textContent = colors.join()
+    // SelectedList.textContent = colors.join()
+    SelectedList.textContent = squashAndJoin(colors)
 
     ATCRefresh()
     
@@ -425,6 +432,18 @@ class ResizableLimitedArray {
       ATC.disabled = true;
     }
   }
+  const squashAndJoin = (arr) => {
+    const counts = {};
+  
+    arr.forEach(item => {
+      counts[item] = (counts[item] || 0) + 1;
+    });
+  
+    return Object.entries(counts)
+      .map(([key, count]) => `${key}(${count})`)
+      .join(", ");
+  }
+
 
   ATC.addEventListener("click", () => {
     const toCartData = [];
