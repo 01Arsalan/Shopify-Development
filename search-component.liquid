@@ -1,0 +1,117 @@
+<style>
+  .search-wrapper {
+    position: relative;
+    width: 500px;
+    margin: 0 auto;
+  }
+
+  .search-input {
+    width: 100%;
+    padding: 10px 15px 10px 45px;
+    border-radius: 999px;
+    border: 1px solid #dcdcdc;
+    background-color: #f8f8f8;
+    font-size: 16px;
+    outline: none;
+    transition: all 0.2s ease;
+  }
+
+  .search-input:focus {
+    border-color: #aaa;
+    background-color: #fff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  }
+
+  .search-icon {
+    position: absolute;
+    top: 50%;
+    left: 15px;
+    transform: translateY(-50%);
+    width: 18px;
+    height: 18px;
+    pointer-events: none;
+    fill: #888;
+  }
+</style>
+
+<div class="search-wrapper">
+  <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <path d="M21.71 20.29l-3.387-3.387a8.5 8.5 0 10-1.414 1.414l3.387 3.387a1 1 0 001.414-1.414zM10.5 17a6.5 6.5 0 110-13 6.5 6.5 0 010 13z"/>
+  </svg>
+  <input id="searchInput_custom_1" type="text" placeholder="Search Products" class="search-input">
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const productGridElements = document.querySelectorAll('#ResultsList .product-grid li.product-grid__item');
+    const bannerElements = document.querySelectorAll('#ResultsList .product-grid .custom-collection-insert');
+
+    function debounce(func, delay) {
+      let timeout;
+      return function (...args) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(this, args), delay);
+      };
+    }
+
+    async function getPredictiveSearchResults(searchTerm) {
+      if (!searchTerm.trim()) {
+        console.log('⚠ Empty search term, skipping');
+        return { data: {}, productIds: [] };
+      }
+
+      const url = `/search/suggest.json?q=${encodeURIComponent(
+        searchTerm
+      )}&resources[type]=product&resources[limit]=50`;
+      console.log('🔍 Fetching:', url);
+
+      try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+        const data = await response.json();
+        console.log('✅ Predictive search data:', data);
+        let productIds = data.resources.results.products.map((p) => p.id);
+        console.log('🛍 Product Ids found:', productIds);
+        return { data, productIds };
+      } catch (err) {
+        console.error('❌ Error fetching predictive search results:', err);
+      }
+    }
+
+    let searchInput_custom_1 = document.getElementById('searchInput_custom_1');
+
+    const debouncedSearch = debounce(async (value) => {
+      const searchData = await getPredictiveSearchResults(value);
+      ShowSearchProducts(searchData);
+    }, 400);
+
+    document.addEventListener('input', (e) => {
+      if (e.target.getAttribute('id') == searchInput_custom_1.getAttribute('id')) {
+        debouncedSearch(e.target.value);
+      }
+    });
+
+    function ShowSearchProducts(searchData) {
+      console.log('search data::', searchData.productIds);
+      console.log('productGridElements::', productGridElements);
+
+      if (!searchData.productIds || searchData.productIds.length === 0) {
+        productGridElements.forEach((el) => (el.style.display = 'block'));
+        bannerElements.forEach((el) => (el.style.display = 'block'));
+        return;
+      }
+
+      const searchIds = searchData.productIds.map(String);
+
+      productGridElements.forEach((el) => {
+        const elId = el.getAttribute('data-product-id');
+        if (!searchIds.includes(String(elId))) {
+          el.style.display = 'none';
+        } else {
+          el.style.display = 'block';
+        }
+        bannerElements.forEach((el) => (el.style.display = 'none'));
+      });
+    }
+  });
+</script>
