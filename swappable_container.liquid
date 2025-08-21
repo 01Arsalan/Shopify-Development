@@ -1,0 +1,337 @@
+{% schema %}
+{
+  "name": "Before & Afters Section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "main_heading",
+      "label": "Main Heading",
+      "default": "Before & afters"
+    },
+    {
+      "type": "text",
+      "id": "sub_heading",
+      "label": "Subheading",
+      "default": "500,000+ big transformations,<br> results within days."
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "highlight_color",
+      "label": "Highlight Color",
+      "default": "#85C93C"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "image_block",
+      "name": "Image",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Upload Image"
+        }
+      ]
+    }
+  ],
+  "max_blocks": 25,
+  "presets": [
+    {
+      "name": "Before & Afters Section",
+      "category": "Custom"
+    }
+  ]
+}
+{% endschema %}
+
+<section class="before-after-slider">
+  <div class="before-after-container">
+    <div class="heading-wrapper">
+      <h2 style="color: {{ section.settings.text_color }}">{{ section.settings.main_heading }}</h2>
+      <p style="color: {{ section.settings.text_color }}">{{ section.settings.sub_heading }}</p>
+    </div>
+
+    <div class="slider-outer-container">
+      <div class="slider-container">
+        <div class="slides-wrapper" id="slidesWrapper">
+          {% for block in section.blocks %}
+            <div class="slide">
+              {% if block.settings.image %}
+                <img src="{{ block.settings.image | img_url: 'master' }}" alt="Slider Image">
+              {% endif %}
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="before-after-slider-buttons">
+        <button id="prevSlide"><img src="https://cdn.shopify.com/s/files/1/0485/7787/2027/files/Frame_48099949_51e6668f-7a44-46a4-9c12-f4f6d506b691.png?v=1737370780&width=1800"></button>
+        <button id="nextSlide"><img src="https://cdn.shopify.com/s/files/1/0485/7787/2027/files/Frame_48099950.png?v=1737375413&width=1800"></button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+.before-after-slider {
+  padding: 4rem 2rem;
+  background: linear-gradient(180.32deg, #FFFFFF 24.14%, rgba(225, 98, 3, 0.4) 68.4%, rgba(255, 255, 255, 0.8) 99.72%);
+  font-family: Arial, sans-serif;
+  overflow: hidden;
+}
+.before-after-container {
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
+.heading-wrapper {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.heading-wrapper h2 {
+  font-family: Migra;
+  font-weight: 800;
+  font-size: 50px;
+  line-height: 28px;
+  letter-spacing: 2px;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.heading-wrapper p {
+  font-family: mori;
+  font-weight: 400;
+  font-size: 30px;
+  line-height: 150%;
+  letter-spacing: 0;
+  text-align: center;
+  vertical-align: middle;
+}
+.heading-wrapper p{
+font-family: mori;
+}
+.before-after-container .heading-wrapper p {
+    max-width: 450px;
+    margin: 0 auto;
+}
+  
+.slider-outer-container {
+  position: relative;
+  max-width: 100%;
+}
+
+.slider-container {
+  position: relative;
+  max-width: calc(365px * 3 + 4rem); /* 3 slides at 365px + gaps */
+  margin: 0 auto;
+  overflow: hidden;
+}
+
+.slides-wrapper {
+  display: flex;
+  transition: transform 0.5s ease-in-out;
+  gap: 2rem;
+}
+
+.slide {
+  width: 365px;
+  max-width: 365px;
+  box-sizing: border-box;
+  border-radius: 0px;
+  flex: 0 0 auto;
+    height: 375px;
+}
+
+.slide img {
+  width: 100%;
+  max-width: 100%;
+  border-radius: 0px;
+  display: block;
+  box-shadow: 0px 4px 6px 0px #00000040;
+}
+
+.before-after-slider-buttons {
+  margin-top: 5rem;
+  display: flex;
+  justify-content: center;
+  gap: 48px;
+}
+
+button#prevSlide {
+  max-width: 60px;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+button#nextSlide {
+  max-width: 60px;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+button#prevSlide[disabled], button#nextSlide[disabled] {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+/* Responsive */
+@media (max-width: 1300px) {
+  .slider-container {
+    overflow: visible;
+    max-width: calc(365px * 2 + 2rem); /* 2 slides + gap on medium screens */
+  }
+}
+
+@media (max-width: 768px) {
+  .before-after-slider {
+  padding: 2rem 2rem;
+  }
+  .slider-container {
+    max-width: 365px; /* 1 slide on mobile */
+  }
+  .before-after-slider-buttons {
+    margin-top: 1rem;
+}
+  .slide {
+  box-shadow: 0px 0px 0px 0px #00000040;
+    height: auto;
+}
+  .slide {
+    min-width: 100%;
+    padding: 1rem 0rem;
+    width:100%;
+  }
+
+  .heading-wrapper h2 {
+    font-size: 30px;
+    line-height: 28px;
+    margin-bottom: 5px;
+  }
+  .heading-wrapper {
+    
+    margin-bottom: 0;
+}
+
+.heading-wrapper p {
+    font-family: mori;
+    font-size: 18px;
+    line-height: 150%;
+}
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const wrapper = document.getElementById('slidesWrapper');
+  const slides = wrapper.querySelectorAll('.slide');
+  const prev = document.getElementById('prevSlide');
+  const next = document.getElementById('nextSlide');
+  
+  let currentIndex = 0;
+  let slidesToShow = getSlidesToShow();
+  
+  function getSlidesToShow() {
+    if (window.innerWidth <= 768) return 1;
+    if (window.innerWidth <= 1300) return 2;
+    return 3;
+  }
+  
+  function updateSlider() {
+    const gap = parseFloat(window.getComputedStyle(wrapper).gap) || 0;
+    const slideWidth = slides[0].offsetWidth + gap;
+
+    const maxIndex = Math.max(slides.length - slidesToShow, 0);
+    currentIndex = Math.min(currentIndex, maxIndex);
+
+    wrapper.style.transform = `translateX(-${currentIndex * slideWidth}px)`;
+  }
+  
+  function handleNavigation(direction) {
+    if (direction === 'prev') {
+      currentIndex = Math.max(currentIndex - 1, 0);
+    } else {
+      if (currentIndex + slidesToShow < slides.length) {
+        currentIndex += 1;
+      }
+    }
+    updateSlider();
+    updateButtonStates();
+  }
+  
+  function updateButtonStates() {
+    prev.disabled = currentIndex === 0;
+    next.disabled = currentIndex + slidesToShow >= slides.length;
+    
+    prev.disabled ? prev.setAttribute('disabled', 'true') : prev.removeAttribute('disabled');
+    next.disabled ? next.setAttribute('disabled', 'true') : next.removeAttribute('disabled');
+  }
+  
+  prev.addEventListener('click', () => !prev.disabled && handleNavigation('prev'));
+  next.addEventListener('click', () => !next.disabled && handleNavigation('next'));
+  
+  window.addEventListener('resize', function() {
+    slidesToShow = getSlidesToShow();
+    updateSlider();
+    updateButtonStates();
+  });
+  
+  // --- SWIPE SUPPORT ---
+  let startX = 0;
+  let startY = 0;
+  let isSwiping = false;
+  let isHorizontalSwipe = false;
+
+  wrapper.addEventListener('touchstart', (e) => {
+    startX = e.touches[0].clientX;
+    startY = e.touches[0].clientY;
+    isSwiping = true;
+    isHorizontalSwipe = false;
+  });
+
+  wrapper.addEventListener('touchmove', (e) => {
+    if (!isSwiping) return;
+    const diffX = e.touches[0].clientX - startX;
+    const diffY = e.touches[0].clientY - startY;
+
+    // Determine swipe direction
+    if (!isHorizontalSwipe && Math.abs(diffX) > Math.abs(diffY)) {
+      isHorizontalSwipe = true;
+    }
+
+    // Block vertical scrolling if it's horizontal swipe
+    if (isHorizontalSwipe) {
+      e.preventDefault();
+    }
+  }, { passive: false }); // passive:false required to use preventDefault
+
+  wrapper.addEventListener('touchend', (e) => {
+    if (!isSwiping) return;
+    isSwiping = false;
+
+    const endX = e.changedTouches[0].clientX;
+    const diff = endX - startX;
+
+    if (Math.abs(diff) > 50 && isHorizontalSwipe) {
+      if (diff > 0) {
+        handleNavigation('prev'); // swipe right
+      } else {
+        handleNavigation('next'); // swipe left
+      }
+    }
+  });
+  // --- END SWIPE ---
+
+  // Initialize
+  updateSlider();
+  updateButtonStates();
+});
+</script>
+
